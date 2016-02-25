@@ -5,16 +5,9 @@
 
 package bank.sockets;
 
-import java.io.IOException;
 import java.net.ConnectException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import bank.Bank;
-import bank.InactiveException;
-import bank.OverdrawException;
 
 public class Driver implements bank.BankDriver {
 	private ClientBank bank = null;

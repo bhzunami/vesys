@@ -3,12 +3,7 @@ package bank.sockets;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Stream;
 
-import bank.Account;
-import bank.Bank;
 import bank.InactiveException;
 import bank.OverdrawException;
 
@@ -23,14 +18,14 @@ public class ServerBank {//implements Bank {
             return null;
         }
         accounts.put(a.getNumber(), a);
-        return a.number;
+        return a.getNumber();
     }
 
     
     public boolean closeAccount(String number) throws IOException {
         Account account = (Account) accounts.get(number);
         
-        if(account == null || account.balance != 0.0 || !account.isActive() ) {
+        if(account == null || account.getBalance() != 0.0 || !account.isActive() ) {
             return false;
         }
         
@@ -62,9 +57,22 @@ public class ServerBank {//implements Bank {
     }
 
     
-    public void transfer(bank.Account a, bank.Account b, double amount)
+    public void transfer(bank.Account from, bank.Account to, double amount)
             throws IOException, IllegalArgumentException, OverdrawException, InactiveException {
-        // TODO Auto-generated method stub
+        if( !from.isActive() || !to.isActive()) {
+            throw new InactiveException("One of the account is inactive");
+        }
+        
+        // Avoid negative amount
+        if(amount < 0.0) amount *= -1;
+        
+        if( amount > from.getBalance() ) {
+            throw new OverdrawException("Not enough money");
+        }
+       
+        from.withdraw(amount);
+        to.deposit(amount);
+
         
     }
     
@@ -81,7 +89,8 @@ public class ServerBank {//implements Bank {
         }
 
         public String toString() {
-            return getNumber() + ";" + getOwner() + ";" + isActive() + ";" + getBalance();
+            // IMPORTATN! Add owner at the end of the String cause the names are fuzzy!
+            return getNumber() + ";" + isActive() + ";" + getBalance()+ ";" + getOwner();
         }
         
         @Override
@@ -91,7 +100,7 @@ public class ServerBank {//implements Bank {
 
         @Override
         public String getOwner() {
-            return owner;
+            return owner;//.replaceAll("%", ";").replaceAll("*", ":");
         }
 
         @Override
@@ -141,6 +150,5 @@ public class ServerBank {//implements Bank {
         }
 
     }
-
 
 }

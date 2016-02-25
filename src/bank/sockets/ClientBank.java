@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import bank.Account;
 import bank.Bank;
 import bank.InactiveException;
 import bank.OverdrawException;
@@ -62,6 +61,8 @@ public class ClientBank implements Bank {
 
     @Override
     public String createAccount(String owner) throws IOException {
+        // Some people think they have to add special characters
+//        owner = owner.replaceAll(";", "%").replaceAll(":", "*:");
         String accountNumber = sendMessage(Task.CREATE_ACCOUNT, owner);
         
         System.out.println("create Account -> Account number: " +accountNumber);
@@ -116,7 +117,22 @@ public class ClientBank implements Bank {
     @Override
     public void transfer(bank.Account a, bank.Account b, double amount)
             throws IOException, IllegalArgumentException, OverdrawException, InactiveException {
-        // TODO Auto-generated method stub
+        String transfer = a.getNumber()+";"+b.getNumber()+";"+amount;
+        String response = sendMessage(Task.TRANSFER, transfer);
+        switch (Answer.valueOf(response)) {
+        case OK:
+            // Update Account!
+            getAccount(a.getNumber());
+            return;
+        case INACTIVE:
+            throw new InactiveException("Account: " +a.getNumber() +" is inactive.");
+        case OVERDRAW:
+            throw new OverdrawException("Not enough money");
+        case NOT_FOUND:
+            throw new IllegalArgumentException("This account ins unknown!");
+        default:
+            throw new UncheckedIOException("ERROR:" + response, null);
+        }
         
     }
     
@@ -134,9 +150,10 @@ public class ClientBank implements Bank {
             System.out.println("Account as String: " +account);
             String[] a = account.split(";", 4);
             this.number = a[0];
-            this.owner = a[1];
-            this.active = Boolean.parseBoolean(a[2]);
-            this.balance = Double.parseDouble(a[3]);
+            // onwer name are crap
+            this.owner = a[3];
+            this.active = Boolean.parseBoolean(a[1]);
+            this.balance = Double.parseDouble(a[2]);
         }
 
         @Override

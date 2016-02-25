@@ -165,6 +165,7 @@ public class FunctionalityTest implements BankTest {
 				msg = "not all names are properly supported";
 			bank.closeAccount(id);
 			
+			// ?!?***!!!!
 			name = "Peter Müller;junior";
 			id = bank.createAccount(name);
 			a = bank.getAccount(id);

@@ -7,5 +7,6 @@ public enum Task {
     CLOSE_ACCOUNT,
     GETACCOUNT,
     DEPOSIT,
-    WITHDRAW
+    WITHDRAW,
+    TRANSFER
 }

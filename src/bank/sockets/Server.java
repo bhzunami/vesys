@@ -90,11 +90,29 @@ public class Server {
                     try {
                         bank.getAccount(number).withdraw(amount.doubleValue());
                         out.println(Answer.OK);
+                        
                     } catch( InactiveException e ) {
                         out.println(Answer.INACTIVE);
                     } catch( OverdrawException e) {
                         out.println(Answer.OVERDRAW);
                     }
+                    break;
+                case TRANSFER:
+                    line = in.readLine();
+                    String a = line.split(";")[0];
+                    bank.Account from = bank.getAccount(a);
+                    String b = line.split(";")[1];
+                    bank.Account to = bank.getAccount(b);
+                    amount = Double.parseDouble(line.split(";")[2]);
+                    try {
+                        bank.transfer(from, to, amount);
+                        out.println(Answer.OK);
+                    } catch( InactiveException e ) {
+                        out.println(Answer.INACTIVE);
+                    } catch( OverdrawException e) {
+                        out.println(Answer.OVERDRAW);
+                    }
+                    break;
 
                 default:
                     out.println(Answer.NOT_FOUND);
